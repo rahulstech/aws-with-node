@@ -4,9 +4,7 @@ const { marshall } = require('@aws-sdk/util-dynamodb')
 
 async function updateContact(id, { name, phone }) {
     try {
-
         // Note: how i mashalled the Key and ExpressionAttributeValue
-
         const res = await dbclient.send(new UpdateItemCommand({
             TableName: 'contacts',
             Key: marshall({ id }),
@@ -30,4 +28,19 @@ async function updateContact(id, { name, phone }) {
     }
 }
 
-updateContact('1746468556796', { name: 'John Doe Jr.', phone: '+914275889966'})
+function update(table) {
+    if (table == 'contacts') {
+        const params = process.argv.slice(4);
+        const [id,name,phone] = params;
+        const newValues = {}
+        if (name) {
+            newValues['name'] = name;
+        }
+        if (phone) {
+            newValues['phone'] = phone;
+        }
+        updateContact(id, newValues);
+    }
+}
+
+module.exports = { update }

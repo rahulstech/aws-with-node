@@ -1,7 +1,7 @@
 const { dbclient } = require('./client')
 const { DeleteItemCommand } = require('@aws-sdk/client-dynamodb')
 
-async function deleteContact(id) {
+async function deleteContactById(id) {
     try {
         const res = await dbclient.send(new DeleteItemCommand({
             TableName: 'contacts',
@@ -14,4 +14,11 @@ async function deleteContact(id) {
     }
 }
 
-deleteContact('1746468556796')
+function deleteById(table) {
+    if (table == 'contacts') {
+        const id = process.argv[4];
+        deleteContactById(id);
+    }
+}
+
+module.exports = { deleteById }

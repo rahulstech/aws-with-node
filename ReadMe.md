@@ -8,3 +8,12 @@
 ### SES (Simple Email Service)
 
 ### S3 (Simple Storage Service)
+
+### DynamoDB
+
+### SQS (Simple Queue Service)
+
+- run basic example
+   ```bash
+   npm run sqs
+   ```

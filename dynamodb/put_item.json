@@ -1,0 +1,10 @@
+{
+"TableName": "user_notes",
+"Item": {
+"user_id": {"S": "user#1"},
+"note_id": {"S": "note#1"},
+"last_modified": {"S": "2025-04-15 14:55:30"},
+"title": {"S": "the first note"},
+"content": {"S": "this is the first note"}
+}
+}

@@ -13,7 +13,7 @@ const client = new S3Client({
 
 async function listObjectWithPrefix(prefix) {
     const cmd = new ListObjectsV2Command({
-        Bucket: S3_BUCKET,
+        Bucket: "aws-lessons-nodejs",
         Prefix: prefix,
     })
 
@@ -27,5 +27,5 @@ async function listObjectWithPrefix(prefix) {
 }
 
 (async () => {
-    await listObjectWithPrefix("medias/1754797406774/")
+    await listObjectWithPrefix("medias/dir1")
 })()

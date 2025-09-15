@@ -1,19 +1,8 @@
-## AWS with NodeJS
+### AWS with NodeJS
 
-### Services I Have Learned
+**Services I Have Learned**
 
-1. [SES (Simple Email Service)](#ses-simple-email-service)
-2. [S3 (Simple Storage Service)](#s3-simple-storage-service)
-
-### SES (Simple Email Service)
-
-### S3 (Simple Storage Service)
-
-### DynamoDB
-
-### SQS (Simple Queue Service)
-
-- run basic example
-   ```bash
-   npm run sqs
-   ```
+1. [SES (Simple Email Service)](./ses)
+2. [S3 (Simple Storage Service)](./s3)
+3. [DyanmoDB](./dynamodb)
+4. [Lamdba](./lambda-nodejs-22)

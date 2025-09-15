@@ -21,7 +21,8 @@ async function readContactById(id) {
     try {
         const res = await dbclient.send(new GetItemCommand({
             TableName: 'contacts',
-            Key: marshall({ id })
+            Key: marshall({ id }),
+            ProjectionExpression: ""
         }));
         console.log('response ', res)
         if (res.Item) {

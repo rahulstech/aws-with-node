@@ -1,0 +1,108 @@
+Create Dynamo DB Table
+======================
+DynamoDB is schemaless  key-value pair and document based db. 
+key-value pair because each item can be get but its primary key or index key
+document bases because item value can be simple string number etc. or more complex json like document 
+schemaless: means like SQL we don't need to define the table structure before hand. During table creation we only define the key attributes only. key attributes means partition key, sort key (optional) and other keys for indexing. later during item insertion we can add any attributes to each item.this powers developer to create denormalized tables. 
+for example: in SQL to store user details and user posts details we will create two tables users and posts. and use the user_id in users table as foreign_key in posts table which will create 1 to many relation from users to posts table. this is the normalized design. in case of dynamo db we will store both user and its posts in the same table named user_posts. in each partition it will contains the user details as well as posts details for the user. in this case user_id will be used as partition key and post_id will be used as sort key. "METADATA" or similar thing can be used as sort key for user details.
+this is how single-table design approach is performed in dynamodb.
+
+Import: in case of dynamo db design the query first, then design the table. for example: if any query from user_posts table requires some data of user then put those user deta in the this table. otherwise no need to store user data unncessarily. 
+this is the major difference between designing sql tables and dynamodb table
+
+Keys
+----
+Partition - a collection
+Partition Key (PK) - a key for uniquely identifying the a particular item in the db or a group or items when sort key also used in composite primary key. this key is required and AttributeType must be HASH
+Sort Key (SK) - a unique key in a partition for identifying each items in that partition uniquely. this key is optional. The AttributeType must be RANGE
+primary key -  PK + SK = Primary Key. to uniquely a item in the table use both the partition key and the sort key.
+
+for example: in user posts table user_id is the partition key (pk) as a single use may have zero or more posts. and to uniquely identify a particular post of an user use sort key (sk) like this:
+{ "PK": { "S": "USER#1"}, "SK":{"S":"POST#1"},{"content":{ "S": "this is post 1"}}}
+{ "PK": { "S": "USER#1"}, "SK":{"S":"POST#2"},{"content":{ "S": "this is post 2"}}}
+{ "PK": { "S": "USER#2"}, "SK":{"S":"POST#1"},{"content":{ "S": "this is another post 1"}}}
+
+Data Types
+----------
+simple: String (S), Number (N), Binary (B), Boolean (BOOL), Null (NULL)
+complex: List (L), Map (M), Set{ String Set (SS), Number Set, (NS), Binary Set (BS) }
+
+Note1: to set null value we do: {"attrname": {"NULL": true}}
+Note2: to set number value we do: {"attrname": {"N": "15"}}. notice the number value is stored as string.
+
+CRUD Methods:
+-------------
+Note1: always prepend # for attribute name and : for attribute value placeholder. for example
+UpdateExpression = "#namekey = :nameval". use ExpressionAttributeName and ExpressionAttributeValues to set key names and key values respectively like this 
+ExpressionAttributeName: {
+"#namekey": "name
+}
+ExpressionAttributeValues: {
+":nameval": {"S": "Rahul"}
+}
+ExpressionAttributeName is a simple string to string map. no need to marshall it. but ExpressionAttributeValues required masrshalling
+	
+1. PutItem - create new item
+{
+"TableName": "users_posts",
+"Items": {
+"PK": {"S": ... },
+"SK": {"S": ... },
+"content": {"S": ... }
+}
+}
+2. GetItem - get a single item
+{
+"TableName": "user_posts",
+"Key": {
+"PK": {"S": ... },
+"SK": {"S": ... }
+}
+}
+NOTE1: we can also use ProjectionExpression to fetch attributes selectively. but read unit costs for the whole item not for the content returned only. for example 1RCU = 4kb. so get item of size 20KB but projecting only one attribute of size 2KB will still cost 5RCUs(20KB/4KB = 5) not 1RCU (1byte to 4KB)
+
+3. Query - get multiple items based on filter
+{
+"TableName": "user_posts",
+"KeyConditionExpression": "PK = :pk AND begins_with(SK,:sk)",
+"ExpressionAttributeValues": {
+":pk": {"S": ... },
+":sk": {"S": ... }
+}
+}
+NOTE1: we need exact partition key value. for sort key (if any) we can either specify an exact value or a pattern matching like begins_with.
+NOTE2: we can also use PartitionExpression here to return limited number of attributes. but it costs only the attributes fetched not the total size of the item. this is the main difference between get-item and query. 
+
+4. UpdateItem - update existing item
+{
+"TableName": "user_posts",
+"Key": {
+"PK": {"S": ... },
+"SK": {"S": ... }
+},
+"UpdateExpression": "SET cola = :cola, colb = :colb", // use SET / REMOVE / ADD
+"ExpressionAttributeValues: {
+":cola": { "S": ... },
+":colb": { "S": ... }
+}
+}
+
+NOTE1: let say an item has albums attribute of type map id -> album. each values of albums is also a map with attrbute like id, name and created_on. now to update a name of an album with id album001 update expression can be "SET #alums.#aid.#name = :aname". observe than we can not use "SET albums.album001.name = :aname".
+
+
+5. DeleteItem - delete existing item
+// single item
+{
+"TableName": "user_posts",
+"Key": {
+"PK": {"S": ...},
+"SK": {"S": ...}
+}
+}
+
+NOTE1: delete item deletes single item not multiple items. therefore delete item requires the exact primary key of the item. if the primary key contains only partition key then only it is required. if primary key is a composite key of partition key and sort key then both are required.
+
+Secondary Indices
+-----------------
+Global Index - 
+Local Index -

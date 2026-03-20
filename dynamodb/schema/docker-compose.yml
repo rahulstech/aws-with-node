@@ -1,0 +1,20 @@
+services:
+  demo-dynamodb:
+    image: amazon/dynamodb-local:latest
+    container_name: aws-with-node-dynamodb
+    ports:
+      - "9000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
+    restart: unless-stopped
+
+
+  demo-dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: aws-with-node-dynamodb-admin
+    ports:
+      - "9001:8001"
+    environment:
+      DYNAMO_ENDPOINT: http://demo-dynamodb:8000
+    depends_on:
+      - demo-dynamodb
+    restart: unless-stopped
